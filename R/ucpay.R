@@ -8,6 +8,14 @@
 #
 #
 
+if(FALSE) {
+
+    z = ucpay(title = "PROF OF CLIN-SFT-VM")
+    z = ucpay("Temple Lang")
+    z = ucpay(maxNum = 3000)
+}
+
+
 library(RCurl)
 library(RJSONIO)
 
@@ -48,7 +56,7 @@ function(name = NA, title = NA, location = "Davis",
 
     u = "https://ucannualwage.ucop.edu/wage/search.action"
     params = list(`_search` = "false", nd = as.character(nd), rows = nrows, page = 1, 
-                  sidx = "EAW_LST_NAM", sord = "asc", year = as.character(year), location = location[], 
+                  sidx = "EAW_LST_NAM", sord = "asc", year = as.character(year), location = CampusNames[location], 
                   firstname = "", lastname = "", title = "", startSal = "", 
                   endSal = "")
 
@@ -56,20 +64,20 @@ function(name = NA, title = NA, location = "Davis",
         if(length(name) == 1)
             name = c(name, "")
         
-        params[ c("lastName", "firstname") ] = name
+        params[ c("lastname", "firstname") ] = name
     }
 
+    if(!is.na(title))
+        params$title = title
 
-    nr = 0
     ans = list()
+    # page through the results.    
     while(TRUE) {
 
         js = httpPOST(u, postfields = paste(names(params), params, sep = "=", collapse = "&"), ...)
         js = gsub("'", '"', js)
         tmp = fromJSON(js)
 
-        # page through the results.
-#        browser()
         ans = c(ans, tmp$rows)
         nr = as.integer(tmp$records)
         if(length(ans) >= nr || (!is.na(maxNum) && length(ans) >= maxNum))
@@ -78,5 +86,25 @@ function(name = NA, title = NA, location = "Davis",
         params$page = params$page + 1L
     }
 
-    ans
+    mkDF(ans)
+}
+
+
+mkDF =
+function(ans)
+{
+    vars = c("Index", "Year", "Location", "FirstName", "LastName", "Title", "GrossPay", "RegularPay", "OvertimePay", "OtherPay")
+    if(length(ans) == 1) 
+        df = as.data.frame(as.list(ans[[1]]$cell))
+    else 
+        df = as.data.frame(t(sapply(ans, function(x) x$cell)))
+
+   
+
+    names(df) = vars
+    numVars = c("Year", "GrossPay", "RegularPay", "OvertimePay", "OtherPay")
+    df[numVars] = lapply(df[numVars], as.numeric)
+
+#NO Gross    df$TotalPay = Reduce(`+`, df[ grep("Pay", names(df))])
+    df
 }
