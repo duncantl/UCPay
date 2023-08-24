@@ -1,0 +1,7 @@
+Package: UCPay
+Version: 0.1-0
+Title: Query UCOP's annual wage data
+Description: Provides access to the data from the ucannualwage Web page
+Author: Duncan Temple Lang
+Maintainer: Duncan Temple Lang <dtemplelang@ucdavis.edu>
+Imports: RCurl, RJSONIO
