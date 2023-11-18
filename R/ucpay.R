@@ -93,6 +93,10 @@ function(name = NA, title = NA, location = "Davis",
 mkDF =
 function(ans)
 {
+
+    if(length(ans) == 0
+       return(NULL) # or a df with no rows but the correct columns.
+    
     vars = c("Index", "Year", "Location", "FirstName", "LastName", "Title", "GrossPay", "RegularPay", "OvertimePay", "OtherPay")
     if(length(ans) == 1) 
         df = as.data.frame(as.list(ans[[1]]$cell))
