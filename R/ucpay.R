@@ -50,13 +50,16 @@ Merced = "Merced", Riverside = "Riverside", `San Diego` = "San Diego",
 
 ucpay = 
 function(name = NA, title = NA, location = "Davis",
-         year = 2022, maxNum = NA, nrows = 1000, nd = now(), ...)
+         year = 2022, maxNum = NA, nrows = 1000, nd = now(),
+         useragent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:132.0) Gecko/20100101 Firefox/132.0",
+         ...)
 {
     location = match.arg(location, names(CampusNames))
 
-    u = "https://ucannualwage.ucop.edu/wage/search.action"
-    params = list(`_search` = "false", nd = as.character(nd), rows = nrows, page = 1, 
-                  sidx = "EAW_LST_NAM", sord = "asc", year = as.character(year), location = CampusNames[location], 
+#    u = "https://ucannualwage.ucop.edu/wage/search.action"
+    u = "https://ucannualwage.ucop.edu/wage/search.do"    
+    params = list(`_search` = "false", nd = gsub("\\.[0-9]+$", "", as.character(nd)), rows = nrows, page = 1, 
+                  sidx = "EAW_LST_NAM", sord = "asc", year = as.character(year), location = unname(CampusNames[location]), 
                   firstname = "", lastname = "", title = "", startSal = "", 
                   endSal = "")
 
@@ -74,7 +77,7 @@ function(name = NA, title = NA, location = "Davis",
     # page through the results.    
     while(TRUE) {
 
-        js = httpPOST(u, postfields = paste(names(params), params, sep = "=", collapse = "&"), ...)
+        js = httpPOST(u, postfields = paste(names(params), params, sep = "=", collapse = "&"), ..., useragent = useragent)
         js = gsub("'", '"', js)
         tmp = fromJSON(js)
 
@@ -94,7 +97,7 @@ mkDF =
 function(ans)
 {
 
-    if(length(ans) == 0
+    if(length(ans) == 0)
        return(NULL) # or a df with no rows but the correct columns.
     
     vars = c("Index", "Year", "Location", "FirstName", "LastName", "Title", "GrossPay", "RegularPay", "OvertimePay", "OtherPay")
