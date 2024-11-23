@@ -41,6 +41,11 @@ Duncan Temple Lang
     z = ucpay(title = "PROF OF CLIN-SFT-VM")
     z = ucpay("Temple Lang")
     z = ucpay(maxNum = 3000)
+
+
+    ac = ucpay(title = "ACADEMIC COORD")
+
+    aa = ucpay(title = "ACADEMIC ADMINISTRATOR")
 }
 \keyword{IO}
 
