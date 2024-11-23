@@ -78,7 +78,8 @@ function(name = NA, title = NA, location = "Davis",
     while(TRUE) {
 
         js = httpPOST(u, postfields = paste(names(params), params, sep = "=", collapse = "&"), ..., useragent = useragent)
-        js = gsub("'", '"', js)
+        #This is chaning names like O'DONNELL and breaking the JSON
+        # js = gsub("'", '"', js)
         tmp = fromJSON(js)
 
         ans = c(ans, tmp$rows)
